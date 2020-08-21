@@ -18,7 +18,6 @@ namespace TYPO3\CMS\Scanner\Matcher;
 use PhpParser\Node;
 use PhpParser\Node\Expr\ConstFetch;
 use PhpParser\Node\Expr\MethodCall;
-use TYPO3\CMS\Scanner\CodeScannerInterface;
 
 /**
  * Match method usages where arguments "in between" are unused but not given as "null":
@@ -52,6 +51,7 @@ class MethodArgumentUnusedMatcher extends AbstractCoreMatcher
         if (!$this->isFileIgnored($node)
             && !$this->isLineIgnored($node)
             && $node instanceof MethodCall
+            && isset($node->name->name)
             && in_array($node->name->name, array_keys($this->flatMatcherDefinitions), true)
         ) {
             $match = [

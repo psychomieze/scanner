@@ -75,12 +75,13 @@ class MethodArgumentRequiredStaticMatcher extends AbstractCoreMatcher
                     ];
                 }
             } elseif ($node->class instanceof Variable
+                && isset($node->name->name)
                 && in_array($node->name->name, array_keys($this->flatMatcherDefinitions), true)
             ) {
                 $match = [
                     'restFiles' => [],
                     'line' => $node->getAttribute('startLine'),
-                    'indicator' => 'weak',
+                    'indicator' => static::INDICATOR_WEAK,
                 ];
 
                 $numberOfArguments = count($node->args);
@@ -94,6 +95,7 @@ class MethodArgumentRequiredStaticMatcher extends AbstractCoreMatcher
                         && $numberOfArguments <= $candidate['maximumNumberOfArguments']
                     ) {
                         $isPossibleMatch = true;
+                        $match['subject'] = $node->name->name;
                         $match['message'] = 'Method "' . $node->name->name . '()" needs at least '
                             . $candidate['numberOfMandatoryArguments'] . ' arguments.';
                         $match['restFiles'] = array_unique(array_merge($match['restFiles'], $candidate['restFiles']));

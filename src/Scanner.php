@@ -90,14 +90,6 @@ class Scanner
             return $this->buildParseExceptionFileMatches($file, $error);
         }
 
-        try {
-            $statements = $this->parser->parse(
-                file_get_contents($file)
-            );
-        } catch (Error $error) {
-            return $this->buildParseExceptionFileMatches($file, $error);
-        }
-
         $matchers = $this->traverserFactory->createMatchers($collection);
         $traverser = $this->traverserFactory->createTraverser(...$matchers);
         $traverser->traverse($statements);
@@ -180,14 +172,15 @@ class Scanner
 
     private function extractFileType(string $restFile): string
     {
-        $normalizedFile = str_replace('\\', '/', $restFile);
-        $paths = explode('/', $normalizedFile);
-        $fileType = explode('-', array_pop($paths))[0];
+        list($fileType) = explode('-', basename($restFile));
         return strtoupper($fileType);
     }
 
     private function getHigherType(string $type, string $fileType): string
     {
+        if (empty($type)) {
+            return $fileType;
+        }
         return ($this->typeRanking[$fileType] > $this->typeRanking[$type]) ? $fileType : $type;
     }
 }
